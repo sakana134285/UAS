@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pesan Sekarang - MY TECH</title>
+  <style>
+    :root {
+      --bg-light: #f4f4f4;
+      --bg-dark: #121212;
+      --text-light: #121212;
+      --text-dark: #f4f4f4;
+    }
+
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-light);
+      transition: background-color 0.3s, color 0.3s, opacity 0.4s ease;
+      opacity: 0;
+    }
+
+    body.loaded {
+      opacity: 1;
+    }
+
+    body.dark {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    header {
+      background-color: #0f172a;
+      color: #ffffff;
+      padding: 1rem;
+      text-align: center;
+      position: relative;
+    }
+
+    nav {
+      margin-top: 10px;
+    }
+
+    nav a {
+      margin: 0 10px;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .toggle-container {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+    }
+
+    .toggle-container input[type="checkbox"] {
+      display: none;
+    }
+
+    .toggle-label {
+      width: 40px;
+      height: 20px;
+      background-color: #888;
+      border-radius: 999px;
+      position: relative;
+      display: block;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .toggle-label::after {
+      content: "";
+      width: 16px;
+      height: 16px;
+      background-color: white;
+      border-radius: 50%;
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.3s ease;
+    }
+
+    input[type="checkbox"]:checked + .toggle-label {
+      background-color: #444;
+    }
+
+    input[type="checkbox"]:checked + .toggle-label::after {
+      transform: translateX(20px);
+    }
+
+    form {
+      max-width: 500px;
+      margin: 2rem auto;
+      padding: 20px;
+      border-radius: 10px;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    body.dark form {
+      background-color: #1e1e1e;
+      color: #fff;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button[type="submit"] {
+      margin-top: 20px;
+      padding: 12px;
+      width: 100%;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .invoice {
+      display: none;
+      max-width: 500px;
+      margin: 2rem auto;
+      padding: 20px;
+      border-radius: 10px;
+      background-color: #000;
+      color: white;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    body.dark .invoice {
+      background-color: #f4f4f4;
+      color: #121212;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Pesan Sekarang di MY TECH</h1>
+    <nav>
+      <a href="index.html">Beranda</a>
+      <a href="pesanan.html">Pesan Sekarang</a>
+      <a href="tentang.html">Tentang Kami</a>
+    </nav>
+    <div class="toggle-container">
+      <input type="checkbox" id="darkmode-toggle" />
+      <label for="darkmode-toggle" class="toggle-label"></label>
+    </div>
+  </header>
+
+  <form id="orderForm">
+    <label for="name">Nama Lengkap</label>
+    <input type="text" id="name" required />
+
+    <label for="category">Pilih Kategori</label>
+    <select id="category" required onchange="updateProducts()">
+      <option value="">-- Pilih Kategori --</option>
+      <option value="aksesoris">Aksesoris HP</option>
+      <option value="gaming">Peralatan Gaming</option>
+      <option value="memori">Memori Eksternal</option>
+    </select>
+
+    <label for="product">Pilih Produk</label>
+    <select id="product" required>
+      <option value="">-- Pilih Produk --</option>
+    </select>
+
+    <label for="quantity">Jumlah yang Dibeli</label>
+    <input type="number" id="quantity" min="1" required />
+
+    <label for="address">Alamat Pengiriman</label>
+    <input type="text" id="address" required />
+
+    <label for="payment">Metode Pembayaran</label>
+    <select id="payment" required>
+      <option value="">-- Pilih Metode --</option>
+      <option value="Transfer Bank">Transfer Bank</option>
+      <option value="COD">COD</option>
+      <option value="E-Wallet">E-Wallet</option>
+    </select>
+
+    <button type="submit">Pesan Sekarang</button>
+  </form>
+
+  <div class="invoice" id="invoiceBox"></div>
+
+  <script>
+    const productData = {
+      aksesoris: {
+        "3 in 1 Ear Cable": 20000,
+        "Phone Strap Genshin": 10000,
+        "Soft Case Glass": 15000,
+        "Stand Holder HP": 17000
+      },
+      gaming: {
+        "Headset Gaming RGB": 120000,
+        "Mousepad XXL RGB": 60000,
+        "Mechanical Keyboard RGB": 250000,
+        "Gaming Mouse 7D": 90000
+      },
+      memori: {
+        "Kingston SSD 240GB": 320000,
+        "Sandisk 256GB": 180000,
+        "Flashdisk Toshiba 64GB": 85000,
+        "Hardisk External WD 1TB": 690000
+      }
+    };
+
+    function updateProducts() {
+      const category = document.getElementById("category").value;
+      const productSelect = document.getElementById("product");
+      productSelect.innerHTML = '<option value="">-- Pilih Produk --</option>';
+      if (productData[category]) {
+        for (let [name, price] of Object.entries(productData[category])) {
+          let opt = document.createElement("option");
+          opt.value = name;
+          opt.textContent = `${name} - Rp${price.toLocaleString()}`;
+          opt.setAttribute("data-price", price);
+          productSelect.appendChild(opt);
+        }
+      }
+    }
+
+    document.getElementById("orderForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value.trim();
+      const productSelect = document.getElementById("product");
+      const productName = productSelect.value;
+      const price = parseInt(productSelect.selectedOptions[0].getAttribute("data-price"));
+      const quantity = parseInt(document.getElementById("quantity").value);
+      const address = document.getElementById("address").value.trim();
+      const payment = document.getElementById("payment").value;
+
+      if (isNaN(price)) {
+        alert("Pilih produk terlebih dahulu.");
+        return;
+      }
+
+      const total = price * quantity;
+
+      document.getElementById("invoiceBox").innerHTML = `
+        <h2>Invoice Pembelian</h2>
+        <p><strong>Nama:</strong> ${name}</p>
+        <p><strong>Produk:</strong> ${productName}</p>
+        <p><strong>Jumlah:</strong> ${quantity}</p>
+        <p><strong>Total Bayar:</strong> Rp${total.toLocaleString()}</p>
+        <p><strong>Metode Pembayaran:</strong> ${payment}</p>
+        <p><strong>Alamat Pengiriman:</strong> ${address}</p>
+      `;
+      document.getElementById("invoiceBox").style.display = "block";
+    });
+
+    const checkbox = document.getElementById('darkmode-toggle');
+    window.addEventListener('DOMContentLoaded', () => {
+      document.body.classList.add('loaded');
+      const isDark = localStorage.getItem('darkmode') === 'true';
+      checkbox.checked = isDark;
+      document.body.classList.toggle('dark', isDark);
+    });
+
+    checkbox.addEventListener('change', function () {
+      document.body.classList.toggle('dark', this.checked);
+      localStorage.setItem('darkmode', this.checked);
+    });
+  </script>
+</body>
+</html>
